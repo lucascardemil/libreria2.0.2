@@ -78,32 +78,31 @@ function promotionClick(promotion, index, mode) {
 	return promotionData
 }
 
-function readUrlTag() {
-  var urlSearchParams = new URLSearchParams(window.location.search);
-  urlSession =url;
-  console.log(url)
-  var eventTagLibrary = urlSearchParams.get('dataTag');
-  if (eventTagLibrary) {
-    var name = urlSearchParams.get('name');
-    var description = urlSearchParams.get('description');
-    var index = urlSearchParams.get('index');
-    var path = urlSearchParams.get('path');
-    var type = urlSearchParams.get('type');
-    dataUrl= {
-      name: name,
-      description: description,
-      index: index,
-      path: path,
-      type: type
-    }
-    console.log(dataUrl)
-    promotionClick(dataUrl, dataUrl.index, 'GA')
-    promotionView(dataUrl, dataUrl.index, 'GA')
-    
-    return dataUrl
-  }
-}
+function promotionByUrl() {
+	var urlSearchParams = new URLSearchParams(window.location.search)
+	urlSession = url
+	console.log(url)
+	var eventTagLibrary = urlSearchParams.get('dataTag')
+	if (eventTagLibrary) {
+		var name = urlSearchParams.get('name')
+		var description = urlSearchParams.get('description')
+		var index = urlSearchParams.get('index')
+		var path = urlSearchParams.get('path')
+		var type = urlSearchParams.get('type')
+		dataUrl = {
+			name: name,
+			description: description,
+			index: index,
+			path: path,
+			type: type,
+		}
+		console.log(dataUrl)
+		promotionClick(dataUrl, dataUrl.index, 'GA')
+		promotionView(dataUrl, dataUrl.index, 'GA')
 
+		return dataUrl
+	}
+}
 
 function productClick(product, index, mode) {
 	productData = {
@@ -175,26 +174,11 @@ function sendSessionStorage(mode) {
 	var promotionSession = sessionStorage.getItem('promotion')
 	var formSession = sessionStorage.getItem('form')
 	var interactionSession = sessionStorage.getItem('interaction')
-	var sessionData = {
-		event: 'sendSessionStorage',
-		detail: {
-			product: productSession,
-			promotion: promotionSession,
-			form: formSession,
-			interaction: tagSession,
-			path: window.location.pathname,
-		},
-	}
+	var sessionData = productSession + promotionSession + formSession + interactionSession
 	if (mode === 'dataLayer') {
 		dataLayer.push(sessionData)
 	} else if (mode === 'GA') {
-		ga('send', 'event', 'tagLibrary 2.0', 'sessionData', {
-      dimension75: productSession.toString(),
-      dimension76: promotionSession.toString(),
-      dimension77: formSession.toString(),
-      dimension78: interactionSession.toString(),
-      dimension79: window.location.pathname,
-    })
+		ga('send', 'event', 'tagLibrary 2.0', 'sendSessionStorage', { dimension75: sessionData })
 	}
 }
 
@@ -206,20 +190,18 @@ function formSend(product, mode) {
 			path: window.location.pathname,
 		},
 	}
-
 	if (mode === 'dataLayer') {
 		dataLayer.push(formData)
 	} else if (mode === 'GA') {
-		ga('send', 'event','tagLibrary 2.0', {
-      dimension68: product.name,
-      dimension69: product.description,
-      dimension70: product.type,
-      dimension71: product.product,
-      dimension72: product.precio,
-      dimension73: product.marca,
-      dimension74: product.forma_pago,
-      dimension79: window.location.pathname,
-    })
+		ga('send', 'event', 'tagLibrary 2.0', {
+			dimension68: product.name,
+			dimension69: product.description,
+			dimension70: product.type,
+			dimension71: product.product,
+			dimension72: product.precio,
+			dimension73: product.marca,
+			dimension74: product.forma_pago,
+		})
 	}
 	return formData
 }
@@ -253,7 +235,7 @@ tagItems.forEach(function (e, i) {
 		}
 	})
 })
-readUrlTag()
+promotionByUrl()
 document.addEventListener('unload', sendSessionStorage())
 
 //------ flujo 3: Formulario ------
