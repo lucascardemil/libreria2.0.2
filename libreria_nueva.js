@@ -128,7 +128,7 @@ function productClick(product, index, mode) {
     return productData;
 }
 
-function tagInteraction(interaction, mode) {
+function tagInteraction(interaction, index, mode) {
     var interactionData = {
         event: 'tagInteraction',
         details: interaction,
@@ -249,15 +249,14 @@ tagItems.forEach(function (e) {
 
 
 //------ flujo 4: Interacciones ------
-tagItems.forEach(function (e) {
+tagItems.forEach(function (e, i) {
     e.addEventListener('click', function (e) {
         var data = JSON.parse(e.target.dataset.tag)
         var type = data.type
         var mode = data.mode || sendMode
         if (type === 'interaction') {
-            interactionData = tagInteraction(data, mode)
+            interactionData = tagInteraction(data, i, mode)
             saveSessionStorage(interactionData)
         }
     })
 });
-
